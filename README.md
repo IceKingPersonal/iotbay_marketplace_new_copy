@@ -68,14 +68,14 @@ http://localhost:5173
 
 To run the full application, both the backend and frontend servers must be running at the same time.
 
-### Terminal 1 — Backend
+### Terminal 1 - Backend
 
 ```powershell
 cd backend
 python app.py
 ```
 
-### Terminal 2 — Frontend
+### Terminal 2 - Frontend
 
 ```powershell
 cd frontend
@@ -126,6 +126,49 @@ cd backend
 python init_db.py
 ```
 
-This creates the required database tables and sample data.
+This creates the required database tables and sample data, including dummy
+Feature 02 device catalogue records. The seeded devices cover every supported
+device category, condition, and status value used by the backend validation.
+
+---
+
+## Backend Test Scripts
+
+The Python test scripts are located in:
+
+```text
+backend/tests
+```
+
+From the main project folder, activate the local virtual environment:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Go into the backend folder:
+
+```powershell
+cd backend
+```
+
+Run the full backend test suite:
+
+```powershell
+python -m pytest
+```
+
+Run only the Feature 02 user-story tests:
+
+```powershell
+python -m pytest tests/test_feature02_story01_create_devices.py
+python -m pytest tests/test_feature02_story02_browse_catalogue.py
+python -m pytest tests/test_feature02_story03_search_devices.py
+python -m pytest tests/test_feature02_story04_update_devices.py
+python -m pytest tests/test_feature02_story05_delete_devices.py
+```
+
+Each Feature 02 story test script includes unit tests, API tests, and an E2E-style
+Flask client workflow for its user story and acceptance criteria.
 
 ---
