@@ -1,0 +1,467 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --ice-cold: #a0d2eb;
+  --freeze-purple: #e5eaf5;
+  --medium-purple: #d0bdf4;
+  --purple-pain: #8458b3;
+  --heavy-purple: #494d5f;
+  --muted-purple: #a28089;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", Arial, sans-serif;
+  background-color: var(--freeze-purple);
+  color: var(--heavy-purple);
+}
+
+/* Overall page layout */
+
+.page {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header-centered {
+  text-align: center;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  color: var(--heavy-purple);
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.page-header p {
+  margin: 0;
+  color: #666666;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.content-card {
+  background-color: white;
+  border-radius: 18px;
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(73, 77, 95, 0.12);
+}
+
+/* Font and colour choice */
+
+h1,
+h2,
+h3,
+p {
+  font-family: "Manrope", Arial, sans-serif;
+}
+
+h2 {
+  color: var(--heavy-purple);
+  font-size: 26px;
+  margin: 0 0 16px;
+}
+
+h3 {
+  color: var(--purple-pain);
+  font-size: 20px;
+  margin: 0 0 14px;
+}
+
+p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--heavy-purple);
+}
+
+/* Links and Buttons */
+
+a {
+  color: var(--purple-pain);
+  font-weight: 600;
+}
+
+a:hover {
+  color: var(--heavy-purple);
+}
+
+.button,
+button {
+  background-color: var(--purple-pain);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-family: "Manrope", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.button:hover,
+button:hover {
+  background-color: var(--heavy-purple);
+}
+
+.button-secondary {
+  background-color: var(--medium-purple);
+  color: var(--heavy-purple);
+}
+
+.button-secondary:hover {
+  background-color: var(--ice-cold);
+}
+
+/* Forms Styling */
+
+form {
+  margin-top: 16px;
+}
+
+label {
+  font-weight: 700;
+  color: var(--heavy-purple);
+}
+
+input,
+select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border: 1px solid var(--medium-purple);
+  border-radius: 10px;
+  font-family: "Manrope", Arial, sans-serif;
+  font-size: 15px;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--ice-cold);
+  border-color: var(--purple-pain);
+}
+
+.error-message {
+  color: #b00020;
+  font-weight: 700;
+}
+
+.success-message {
+  color: var(--purple-pain);
+  font-weight: 700;
+}
+
+/* Profile / Edit Profile Styling */
+
+.detail-section {
+  margin-top: 28px;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 20px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.detail-label {
+  font-weight: 700;
+  color: var(--heavy-purple);
+}
+
+/* Badges */
+
+.badge {
+  width: fit-content;
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.badge-purple {
+  background-color: var(--medium-purple);
+  color: var(--heavy-purple);
+}
+
+.badge-blue {
+  background-color: var(--ice-cold);
+  color: var(--heavy-purple);
+}
+
+/* Navbar Styling */
+
+.navbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 50px;
+  padding: 0 24px;
+  background-color: var(--heavy-purple);
+  color: var(--freeze-purple);
+  font-family: "Manrope", Arial, sans-serif;
+  box-shadow: 0 4px 14px rgba(73, 77, 95, 0.16);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navbar-left a {
+  color: var(--freeze-purple);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.navbar-left a:hover {
+  color: var(--ice-cold);
+}
+
+.navbar-center {
+  color: var(--freeze-purple);
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+}
+
+.navbar-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.navbar-logout {
+  background-color: transparent;
+  color: var(--freeze-purple);
+  border: none;
+  padding: 8px 0;
+  border-radius: 0;
+  font-family: "Manrope", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navbar-logout:hover {
+  background-color: transparent;
+  color: var(--ice-cold);
+}
+
+/* Edit Profile Page Styling */
+.edit-profile-card {
+  margin-bottom: 24px;
+}
+
+.cancel-account-card {
+  margin-bottom: 24px;
+}
+
+.edit-profile-card h2,
+.cancel-account-card h2 {
+  color: var(--heavy-purple);
+}
+
+.danger-button {
+  background-color: var(--purple-pain);
+}
+
+.danger-button:hover {
+  background-color: var(--heavy-purple);
+}
+
+/* Login Page Styling */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.login-page form {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-page input {
+  max-width: 100%;
+}
+
+.login-page h1 {
+  color: var(--heavy-purple);
+  margin-bottom: 24px;
+}
+
+/* Register Page Styling */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 560px;
+  background-color: white;
+  padding: 42px;
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(73, 77, 95, 0.12);
+}
+
+.auth-card h1 {
+  color: var(--heavy-purple);
+  margin: 0 0 28px;
+  letter-spacing: 1.5px;
+  font-size: 30px;
+}
+
+.auth-subtitle {
+  margin-bottom: 28px;
+  color: #666666;
+}
+
+.auth-card form {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.auth-card button {
+  margin-top: 8px;
+}
+
+.auth-card > p:last-child {
+  text-align: center;
+  margin-top: 24px;
+}
+
+/* Dashboard Styling */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.feature-card {
+  background-color: white;
+  border-radius: 18px;
+  padding: 28px;
+  min-height: 190px;
+  box-shadow: 0 8px 24px rgba(73, 77, 95, 0.12);
+  text-decoration: none;
+  color: var(--heavy-purple);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(73, 77, 95, 0.18);
+}
+
+.feature-card h3 {
+  color: var(--purple-pain);
+  font-size: 15px;
+  margin: 0 0 10px;
+}
+
+.feature-card h2 {
+  color: var(--heavy-purple);
+  font-size: 24px;
+  margin: 0 0 12px;
+}
+
+.feature-card p {
+  color: #666666;
+  margin: 0;
+}
+
+/* Access Logs Page Styling */
+
+.access-logs-card {
+  overflow: hidden;
+}
+
+.access-log-search {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.access-log-search label {
+  flex: 1;
+  min-width: 240px;
+}
+
+.access-log-search input {
+  max-width: 260px;
+}
+
+.access-log-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.access-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  color: var(--heavy-purple);
+}
+
+.access-log-table th {
+  background-color: var(--heavy-purple);
+  color: var(--freeze-purple);
+  text-align: left;
+  padding: 14px;
+  font-weight: 700;
+}
+
+.access-log-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--freeze-purple);
+}
+
+.access-log-table tr:hover {
+  background-color: var(--freeze-purple);
+}
+
+.access-log-table th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.access-log-table th:last-child {
+  border-top-right-radius: 10px;
+}
