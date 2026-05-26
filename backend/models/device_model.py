@@ -60,6 +60,19 @@ class DeviceModel:
         return device
 
     @staticmethod
+    def find_by_ids(device_ids):
+        db = get_db()
+        placeholders = ", ".join(["?"] * len(device_ids))
+
+        devices = db.execute(f"""
+            SELECT *
+            FROM devices
+            WHERE device_id IN ({placeholders})
+        """, device_ids).fetchall()
+
+        return devices
+
+    @staticmethod
     def list_devices(filters):
         db = get_db()
 
@@ -187,6 +200,32 @@ class DeviceModel:
 
         db.commit()
         return True
+
+    @staticmethod
+    def delete_devices(device_ids, staff_user_id):
+        db = get_db()
+
+        for device_id in device_ids:
+            db.execute("""
+                UPDATE devices
+                SET status = 'archived',
+                    updated_by = ?,
+                    updated_at = datetime('now', 'localtime')
+                WHERE device_id = ?
+            """, (
+                staff_user_id,
+                device_id
+            ))
+
+            DeviceModel.create_audit_log(
+                device_id,
+                staff_user_id,
+                "deleted",
+                "Device archived."
+            )
+
+        db.commit()
+        return device_ids
 
     @staticmethod
     def create_audit_log(device_id, staff_user_id, action, details):

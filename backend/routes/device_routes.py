@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.device_service import (
+    bulk_delete_devices,
     create_device,
     delete_device,
     get_device,
@@ -15,6 +16,7 @@ device_routes = Blueprint("device_routes", __name__)
 
 @device_routes.route("", methods=["GET"])
 @device_routes.route("/", methods=["GET"])
+@login_required
 def view_devices():
     devices, error, status_code = list_devices(request.args)
 
@@ -27,6 +29,7 @@ def view_devices():
 
 
 @device_routes.route("/search", methods=["GET"])
+@login_required
 def search_devices():
     devices, error, status_code = list_devices(request.args)
 
@@ -39,6 +42,7 @@ def search_devices():
 
 
 @device_routes.route("/<int:device_id>", methods=["GET"])
+@login_required
 def view_device(device_id):
     device, error, status_code = get_device(device_id)
 
@@ -68,6 +72,27 @@ def add_device():
     return jsonify({
         "message": "Device created successfully.",
         "device": device
+    }), status_code
+
+
+@device_routes.route("", methods=["DELETE"])
+@device_routes.route("/", methods=["DELETE"])
+@login_required
+def remove_devices():
+    data = request.get_json()
+
+    if data is None:
+        return jsonify({"error": "Request body must be JSON."}), 400
+
+    user = get_current_user()
+    result, error, status_code = bulk_delete_devices(data, user)
+
+    if error:
+        return jsonify({"error": error}), status_code
+
+    return jsonify({
+        "message": "Devices archived successfully.",
+        "devices": result
     }), status_code
 
 

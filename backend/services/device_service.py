@@ -60,6 +60,29 @@ def to_integer(value, field_name):
     return number, None
 
 
+def sanitize_device_ids(data):
+    device_ids = data.get("device_ids")
+
+    if not isinstance(device_ids, list) or len(device_ids) == 0:
+        return None, "device_ids must be a non-empty list."
+
+    sanitized_ids = []
+
+    for device_id in device_ids:
+        sanitized_id, error = to_integer(device_id, "Device ID")
+
+        if error:
+            return None, error
+
+        if sanitized_id <= 0:
+            return None, "Device ID must be a positive whole number."
+
+        if sanitized_id not in sanitized_ids:
+            sanitized_ids.append(sanitized_id)
+
+    return sanitized_ids, None
+
+
 def sanitize_device_data(data, existing_device=None):
     sanitized_data = {}
 
@@ -298,6 +321,35 @@ def delete_device(device_id, user):
     DeviceModel.delete_device(device_id, user["user_id"])
 
     return {"device_id": device_id}, None, 200
+
+
+def bulk_delete_devices(data, user):
+    staff_error = validate_staff_user(user)
+
+    if staff_error:
+        return None, staff_error, 403
+
+    device_ids, error = sanitize_device_ids(data)
+
+    if error:
+        return None, error, 400
+
+    existing_devices = DeviceModel.find_by_ids(device_ids)
+    existing_device_ids = [device["device_id"] for device in existing_devices]
+    missing_device_ids = [
+        device_id
+        for device_id in device_ids
+        if device_id not in existing_device_ids
+    ]
+
+    if missing_device_ids:
+        return None, "One or more devices were not found.", 404
+
+    archived_device_ids = DeviceModel.delete_devices(device_ids, user["user_id"])
+
+    return {
+        "device_ids": archived_device_ids
+    }, None, 200
 
 
 def get_device_audit_logs(device_id, user):
