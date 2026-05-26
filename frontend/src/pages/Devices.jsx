@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { apiRequest } from "../api/apiClient.js";
+import { useCallback, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { apiRequest, isUnauthorizedError } from "../api/apiClient.js";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const categories = [
   { value: "", label: "All categories" },
@@ -15,7 +17,30 @@ const categories = [
   { value: "other", label: "Other" },
 ];
 
+function getDevicesEndpoint(filters = {}) {
+  const params = new URLSearchParams();
+
+  if (filters.searchTerm) {
+    params.append("q", filters.searchTerm);
+  }
+
+  if (filters.category) {
+    params.append("category", filters.category);
+  }
+
+  if (filters.inStockOnly) {
+    params.append("in_stock", "true");
+  }
+
+  const query = params.toString();
+
+  return query ? `/devices?${query}` : "/devices";
+}
+
 function Devices() {
+  const navigate = useNavigate();
+  const { isLoggedIn, loading: authLoading, logout } = useAuth();
+
   const [devices, setDevices] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("");
@@ -23,25 +48,23 @@ function Devices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  function getDevicesEndpoint(filters = {}) {
-    const params = new URLSearchParams();
-
-    if (filters.searchTerm) {
-      params.append("q", filters.searchTerm);
+  const handleUnauthorizedApiError = useCallback(async (error) => {
+    if (!isUnauthorizedError(error)) {
+      return false;
     }
 
-    if (filters.category) {
-      params.append("category", filters.category);
-    }
+    setDevices([]);
+    setSearchTerm("");
+    setCategory("");
+    setInStockOnly(false);
+    setError("");
+    setLoading(false);
 
-    if (filters.inStockOnly) {
-      params.append("in_stock", "true");
-    }
+    await logout();
+    navigate("/");
 
-    const query = params.toString();
-
-    return query ? `/devices?${query}` : "/devices";
-  }
+    return true;
+  }, [logout, navigate]);
 
   async function fetchDevices(filters = {}) {
     setLoading(true);
@@ -53,6 +76,10 @@ function Devices() {
 
       setDevices(data.devices);
     } catch (error) {
+      if (await handleUnauthorizedApiError(error)) {
+        return;
+      }
+
       setError(error.message);
       setDevices([]);
     } finally {
@@ -61,6 +88,10 @@ function Devices() {
   }
 
   useEffect(() => {
+    if (authLoading || !isLoggedIn) {
+      return;
+    }
+
     let isActive = true;
 
     async function fetchInitialDevices() {
@@ -71,6 +102,10 @@ function Devices() {
           setDevices(data.devices);
         }
       } catch (error) {
+        if (await handleUnauthorizedApiError(error)) {
+          return;
+        }
+
         if (isActive) {
           setError(error.message);
           setDevices([]);
@@ -87,7 +122,7 @@ function Devices() {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [authLoading, handleUnauthorizedApiError, isLoggedIn]);
 
   function handleSearch(event) {
     event.preventDefault();
@@ -119,6 +154,32 @@ function Devices() {
 
   function formatPrice(value) {
     return `$${Number(value).toFixed(2)}`;
+  }
+
+  if (authLoading) {
+    return (
+      <div className="page">
+        <div className="page-header page-header-centered">
+          <h1>IoT Device Catalogue</h1>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <div className="page">
+        <div className="page-header page-header-centered">
+          <h1>IoT Device Catalogue</h1>
+          <p>You must be logged in to view the device catalogue.</p>
+        </div>
+
+        <Link className="button" to="/">
+          Go to Login
+        </Link>
+      </div>
+    );
   }
 
   return (

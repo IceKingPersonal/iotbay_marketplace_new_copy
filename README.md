@@ -90,7 +90,7 @@ http://localhost:5173
 
 ### Feature 02 - IoT Device Catalogue
 
-After logging in, open the dashboard and select `Feature 02 - IoT Device Catalogue Management`, or use the navbar link named `Devices`.
+After logging in, open the dashboard and select `Feature 02 - IoT Device Catalogue Management`, or use the navbar link named `Devices`. If a user is not logged in, the page shows a login-required message. If the backend returns an unauthorized response because the session has expired, the frontend clears the device page state and returns the user to the login page.
 
 The device catalogue page is available at:
 
