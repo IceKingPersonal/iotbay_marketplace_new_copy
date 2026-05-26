@@ -104,6 +104,8 @@ The page uses the backend device catalogue API:
 GET http://localhost:5000/api/devices
 ```
 
+Staff users can create, update, archive, and audit device records through the protected `/api/devices` endpoints. Device records require a name, category/type, brand, model, price, stock quantity, condition, and status. The backend validates device categories, numeric price and stock ranges, condition values, and status values before saving records.
+
 Run the backend database setup before using Feature 02 so the device catalogue tables exist:
 
 ```powershell

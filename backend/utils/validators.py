@@ -49,6 +49,112 @@ def is_valid_text_only(value):
     pattern = r"^[A-Za-z\s'-]+$"
     return re.match(pattern, value) is not None
 
+
+DEVICE_CATEGORIES = [
+    "sensor",
+    "actuator",
+    "controller",
+    "gateway",
+    "camera",
+    "wearable",
+    "smart_home",
+    "industrial",
+    "accessory",
+    "other"
+]
+
+DEVICE_CONDITIONS = ["new", "used", "refurbished"]
+DEVICE_STATUSES = ["active", "inactive", "archived"]
+
+
+def is_valid_device_name(name):
+    return name is not None and 1 <= len(str(name).strip()) <= 120
+
+
+def is_valid_device_category(category):
+    return category in DEVICE_CATEGORIES
+
+
+def is_valid_device_brand(brand):
+    return brand is not None and 1 <= len(str(brand).strip()) <= 80
+
+
+def is_valid_device_model(model):
+    return model is not None and 1 <= len(str(model).strip()) <= 80
+
+
+def is_valid_device_description(description):
+    return description is None or len(str(description).strip()) <= 1000
+
+
+def is_valid_device_price(price):
+    if isinstance(price, bool):
+        return False
+
+    try:
+        price = float(price)
+    except (TypeError, ValueError):
+        return False
+
+    return 0 <= price <= 100000
+
+
+def is_valid_device_stock_quantity(stock_quantity):
+    if isinstance(stock_quantity, bool):
+        return False
+
+    try:
+        if isinstance(stock_quantity, float) and not stock_quantity.is_integer():
+            return False
+
+        stock_quantity = int(stock_quantity)
+    except (TypeError, ValueError):
+        return False
+
+    return 0 <= stock_quantity <= 100000
+
+
+def is_valid_device_condition(condition):
+    return condition in DEVICE_CONDITIONS
+
+
+def is_valid_device_status(status):
+    return status in DEVICE_STATUSES
+
+
+#Validates Feature 02 device catalogue data before records are saved.
+def validate_device_data(data):
+    category = data.get("category") or data.get("type")
+
+    if not is_valid_device_name(data.get("name")):
+        return False, "Device name is required and must be 120 characters or fewer."
+
+    if not is_valid_device_category(category):
+        return False, "Category must be a valid IoT device category."
+
+    if not is_valid_device_brand(data.get("brand")):
+        return False, "Brand is required and must be 80 characters or fewer."
+
+    if not is_valid_device_model(data.get("model")):
+        return False, "Model is required and must be 80 characters or fewer."
+
+    if not is_valid_device_description(data.get("description")):
+        return False, "Description must be 1000 characters or fewer."
+
+    if not is_valid_device_price(data.get("price")):
+        return False, "Price must be a number between 0 and 100000."
+
+    if not is_valid_device_stock_quantity(data.get("stock_quantity")):
+        return False, "Stock quantity must be a whole number between 0 and 100000."
+
+    if not is_valid_device_condition(data.get("condition")):
+        return False, "Condition must be new, used, or refurbished."
+
+    if not is_valid_device_status(data.get("status")):
+        return False, "Status must be active, inactive, or archived."
+
+    return True, None
+
 #Validates registration info for customers and staff. Gives either a valid or error message depending on input.
 def validate_registration_data(data):
 

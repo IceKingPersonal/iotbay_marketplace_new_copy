@@ -1,21 +1,9 @@
 from models.device_model import DeviceModel
-
-
-ALLOWED_CATEGORIES = [
-    "sensor",
-    "actuator",
-    "controller",
-    "gateway",
-    "camera",
-    "wearable",
-    "smart_home",
-    "industrial",
-    "accessory",
-    "other"
-]
-
-ALLOWED_CONDITIONS = ["new", "used", "refurbished"]
-ALLOWED_STATUSES = ["active", "inactive", "archived"]
+from utils.validators import (
+    DEVICE_CATEGORIES,
+    DEVICE_CONDITIONS,
+    validate_device_data
+)
 
 
 def clean_text(value):
@@ -46,6 +34,9 @@ def validate_staff_user(user):
 
 
 def to_float(value, field_name):
+    if isinstance(value, bool):
+        return None, f"{field_name} must be a number."
+
     try:
         number = float(value)
     except (TypeError, ValueError):
@@ -55,7 +46,13 @@ def to_float(value, field_name):
 
 
 def to_integer(value, field_name):
+    if isinstance(value, bool):
+        return None, f"{field_name} must be a whole number."
+
     try:
+        if isinstance(value, float) and not value.is_integer():
+            return None, f"{field_name} must be a whole number."
+
         number = int(value)
     except (TypeError, ValueError):
         return None, f"{field_name} must be a whole number."
@@ -67,7 +64,7 @@ def sanitize_device_data(data, existing_device=None):
     sanitized_data = {}
 
     name = clean_text(data.get("name"))
-    category = normalize_option(data.get("category"))
+    category = normalize_option(data.get("category") or data.get("type"))
     brand = clean_text(data.get("brand"))
     model = clean_text(data.get("model"))
     description = clean_text(data.get("description"))
@@ -93,7 +90,7 @@ def sanitize_device_data(data, existing_device=None):
     if len(name) > 120:
         return None, "Device name must be 120 characters or fewer."
 
-    if category not in ALLOWED_CATEGORIES:
+    if category not in DEVICE_CATEGORIES:
         return None, "Category must be a valid IoT device category."
 
     if not brand:
@@ -141,14 +138,11 @@ def sanitize_device_data(data, existing_device=None):
     if condition is None:
         condition = "new"
 
-    if condition not in ALLOWED_CONDITIONS:
+    if condition not in DEVICE_CONDITIONS:
         return None, "Condition must be new, used, or refurbished."
 
     if status is None:
         status = "active"
-
-    if status not in ALLOWED_STATUSES:
-        return None, "Status must be active, inactive, or archived."
 
     sanitized_data["name"] = name
     sanitized_data["category"] = category
@@ -167,7 +161,7 @@ def sanitize_device_filters(args):
     filters = {}
 
     search = clean_text(args.get("q") or args.get("search"))
-    category = normalize_option(args.get("category"))
+    category = normalize_option(args.get("category") or args.get("type"))
     brand = clean_text(args.get("brand"))
     condition = normalize_option(args.get("condition"))
     min_price = clean_text(args.get("min_price"))
@@ -178,7 +172,7 @@ def sanitize_device_filters(args):
         filters["search"] = search[:100]
 
     if category:
-        if category not in ALLOWED_CATEGORIES:
+        if category not in DEVICE_CATEGORIES:
             return None, "Category must be a valid IoT device category."
         filters["category"] = category
 
@@ -186,7 +180,7 @@ def sanitize_device_filters(args):
         filters["brand"] = brand[:80]
 
     if condition:
-        if condition not in ALLOWED_CONDITIONS:
+        if condition not in DEVICE_CONDITIONS:
             return None, "Condition must be new, used, or refurbished."
         filters["condition"] = condition
 
@@ -252,6 +246,11 @@ def create_device(data, user):
     if error:
         return None, error, 400
 
+    is_valid, error = validate_device_data(sanitized_data)
+
+    if not is_valid:
+        return None, error, 400
+
     device_id = DeviceModel.create_device(sanitized_data, user["user_id"])
     device = DeviceModel.find_by_id(device_id)
 
@@ -272,6 +271,11 @@ def update_device(device_id, data, user):
     sanitized_data, error = sanitize_device_data(data, existing_device)
 
     if error:
+        return None, error, 400
+
+    is_valid, error = validate_device_data(sanitized_data)
+
+    if not is_valid:
         return None, error, 400
 
     DeviceModel.update_device(device_id, sanitized_data, user["user_id"])
