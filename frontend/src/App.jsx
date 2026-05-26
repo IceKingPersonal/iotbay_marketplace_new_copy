@@ -5,6 +5,7 @@ import Register from "./pages/Register.jsx";
 import Profile from "./pages/Profile.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
 import AccessLogs from "./pages/AccessLogs.jsx";
+import Devices from "./pages/Devices.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Navbar from "./components/Navbar.jsx";
 
@@ -55,6 +56,15 @@ function App() {
         element={
           <AppLayout>
             <AccessLogs />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/devices"
+        element={
+          <AppLayout>
+            <Devices />
           </AppLayout>
         }
       />

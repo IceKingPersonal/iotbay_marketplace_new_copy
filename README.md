@@ -88,6 +88,29 @@ Then open the frontend in your browser:
 http://localhost:5173
 ```
 
+### Feature 02 - IoT Device Catalogue
+
+After logging in, open the dashboard and select `Feature 02 - IoT Device Catalogue Management`, or use the navbar link named `Devices`.
+
+The device catalogue page is available at:
+
+```text
+http://localhost:5173/devices
+```
+
+The page uses the backend device catalogue API:
+
+```text
+GET http://localhost:5000/api/devices
+```
+
+Run the backend database setup before using Feature 02 so the device catalogue tables exist:
+
+```powershell
+cd backend
+python init_db.py
+```
+
 ---
 
 ## Database Note

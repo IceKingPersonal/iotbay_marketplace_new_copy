@@ -465,3 +465,85 @@ select:focus {
 .access-log-table th:last-child {
   border-top-right-radius: 10px;
 }
+
+/* Device Catalogue Page Styling */
+
+.devices-card {
+  overflow: hidden;
+}
+
+.device-search {
+  display: grid;
+  grid-template-columns: minmax(260px, 2fr) minmax(180px, 1fr) auto auto;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+}
+
+.checkbox-label input {
+  width: auto;
+  margin: 0;
+}
+
+.device-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.device-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  color: var(--heavy-purple);
+}
+
+.device-table th {
+  background-color: var(--heavy-purple);
+  color: var(--freeze-purple);
+  text-align: left;
+  padding: 14px;
+  font-weight: 700;
+}
+
+.device-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--freeze-purple);
+  vertical-align: top;
+}
+
+.device-table tr:hover {
+  background-color: var(--freeze-purple);
+}
+
+.device-table th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.device-table th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.device-description {
+  display: block;
+  margin-top: 6px;
+  color: #666666;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+@media (max-width: 820px) {
+  .device-search {
+    grid-template-columns: 1fr;
+  }
+
+  .device-actions {
+    flex-wrap: wrap;
+  }
+}
