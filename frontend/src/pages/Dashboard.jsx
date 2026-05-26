@@ -41,11 +41,11 @@ function Dashboard() {
           <p>View and search your login and logout history.</p>
         </Link>
 
-        <div className="feature-card">
+        <Link className="feature-card" to="/devices">
           <h3>Feature 02</h3>
           <h2>IoT Device Catalogue Management</h2>
           <p>Browse, search, and manage IoT device records.</p>
-        </div>
+        </Link>
 
         <div className="feature-card">
           <h3>Feature 03</h3>
