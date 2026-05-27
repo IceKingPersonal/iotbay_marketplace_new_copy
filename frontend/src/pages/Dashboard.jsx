@@ -1,6 +1,6 @@
 // Displays the logged in user's dashboard. Edit this by adding a link from your feature to each page
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 
 function Dashboard() {
   const { user, isLoggedIn, loading } = useAuth();

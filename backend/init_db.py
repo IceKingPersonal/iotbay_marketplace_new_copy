@@ -149,8 +149,9 @@ def validate_sample_device_category_coverage():
         )
 
 
-def create_tables():
-    connection = sqlite3.connect(DATABASE)
+def create_tables(database=None):
+    database = database or DATABASE
+    connection = sqlite3.connect(database)
     cursor = connection.cursor()
 
     cursor.execute("""
@@ -293,10 +294,11 @@ def create_tables():
     connection.commit()
     connection.close()
 
-def insert_sample_data():
+def insert_sample_data(database=None):
+    database = database or DATABASE
     validate_sample_device_category_coverage()
 
-    connection = sqlite3.connect(DATABASE)
+    connection = sqlite3.connect(database)
     cursor = connection.cursor()
 
     sample_users = [
@@ -407,16 +409,24 @@ def insert_sample_data():
     ]
     
     for product in sample_products:
-        try:
-            cursor.execute(
-                """
-                INSERT INTO products (device_name, manufacturer, type, price, stock_qty)
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                product,
-            )
-        except sqlite3.IntegrityError:
-            pass
+        existing_product = cursor.execute("""
+            SELECT product_id
+            FROM products
+            WHERE device_name = ?
+              AND manufacturer = ?
+              AND type = ?
+        """, product[:3]).fetchone()
+
+        if existing_product:
+            continue
+
+        cursor.execute(
+            """
+            INSERT INTO products (device_name, manufacturer, type, price, stock_qty)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            product,
+        )
         
     connection.commit()
     connection.close()
