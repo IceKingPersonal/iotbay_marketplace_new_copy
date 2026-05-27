@@ -47,11 +47,11 @@ function Dashboard() {
           <p>Browse, search, and manage IoT device records.</p>
         </Link>
 
-        <div className="feature-card">
+        <Link className="feature-card" to="/orders">
           <h3>Feature 03</h3>
           <h2>Orders</h2>
           <p>Create, view, update, and cancel customer orders.</p>
-        </div>
+        </Link>
 
         <div className="feature-card">
           <h3>Feature 04</h3>

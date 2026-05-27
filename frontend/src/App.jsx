@@ -61,10 +61,19 @@ function App() {
       />
 
       <Route
-        path="/devices"
+        path="/orders"
         element={
           <AppLayout>
-            <Devices />
+            <Orders />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/orders/:orderId"
+        element={
+          <AppLayout>
+            <OrderDetail />
           </AppLayout>
         }
       />

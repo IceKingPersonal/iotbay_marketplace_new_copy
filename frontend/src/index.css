@@ -537,6 +537,12 @@ button:disabled {
   gap: 12px;
 }
 
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.access-log-table
 .device-table {
   width: 100%;
   border-collapse: collapse;
@@ -544,12 +550,152 @@ button:disabled {
   color: var(--heavy-purple);
 }
 
+.access-log-table th 
 .device-table th {
   background-color: var(--heavy-purple);
   color: var(--freeze-purple);
   text-align: left;
   padding: 14px;
   font-weight: 700;
+}
+
+.access-log-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--freeze-purple);
+}
+
+.access-log-table tr:hover {
+  background-color: var(--freeze-purple);
+}
+
+.access-log-table th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.access-log-table th:last-child {
+  border-top-right-radius: 10px;
+}
+
+/* Orders feature (Feature 03) */
+
+.muted {
+  color: #666666;
+  font-size: 15px;
+}
+
+.card,
+.form {
+  background-color: white;
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(73, 77, 95, 0.12);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.field span {
+  font-weight: 700;
+  color: var(--heavy-purple);
+  margin-bottom: 6px;
+}
+
+.btn {
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary,
+button.btn-primary {
+  background-color: var(--purple-pain);
+  color: white;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover {
+  background-color: var(--heavy-purple);
+}
+
+.btn-secondary,
+button.btn-secondary,
+a.btn-secondary {
+  background-color: var(--medium-purple);
+  color: var(--heavy-purple);
+}
+
+.btn-secondary:hover,
+button.btn-secondary:hover,
+a.btn-secondary:hover {
+  background-color: var(--ice-cold);
+}
+
+.form-error {
+  color: #b00020;
+  font-weight: 700;
+  margin: 12px 0;
+}
+
+.product-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.product-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  background-color: white;
+  border-radius: 18px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 24px rgba(73, 77, 95, 0.12);
+  text-align: left;
+}
+
+.product-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.order-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.order-status--saved {
+  background-color: rgba(160, 210, 235, 0.5);
+  color: var(--heavy-purple);
+}
+
+.order-status--paid {
+  background-color: rgba(208, 189, 244, 0.6);
+  color: var(--purple-pain);
+}
+
+.order-status--cancelled {
+  background-color: rgba(176, 0, 32, 0.12);
+  color: #b00020;
 }
 
 .device-table td {
