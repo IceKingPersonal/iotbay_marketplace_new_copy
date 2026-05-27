@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 //Imports the API helper used to send requests to backend.
 import { apiRequest } from "../api/apiClient.js";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 
 //Displays the logged-in user's access logs. They can view their login/logout history and search logs by the date.
 function AccessLogs() {
@@ -12,7 +12,7 @@ function AccessLogs() {
 
   const [logs, setLogs] = useState([]);
   const [searchDate, setSearchDate] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   //Fetches access logs from backend. If no date is provided it shows all logs for user. If a date is provided it shows that specific dates logs.
@@ -38,9 +38,36 @@ function AccessLogs() {
   }
 
   useEffect(() => {
-    if (!authLoading && isLoggedIn) {
-      fetchLogs();
+    if (authLoading || !isLoggedIn) {
+      return;
     }
+
+    let isActive = true;
+
+    async function fetchInitialLogs() {
+      try {
+        const data = await apiRequest("/access-logs/me");
+
+        if (isActive) {
+          setLogs(data.logs);
+        }
+      } catch (error) {
+        if (isActive) {
+          setError(error.message);
+          setLogs([]);
+        }
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchInitialLogs();
+
+    return () => {
+      isActive = false;
+    };
   }, [authLoading, isLoggedIn]);
 
   function handleSearch(event) {

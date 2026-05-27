@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getOrder, patchOrderStatus } from "../api/orders.js";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 
 function formatMoney(cents) {
   return (cents / 100).toFixed(2);
@@ -26,12 +26,6 @@ function OrderDetail() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    if (!authLoading && isLoggedIn && Number.isInteger(id) && id > 0) {
-      loadOrder();
-    }
-  }, [authLoading, isLoggedIn, id]);
-
   async function loadOrder() {
     setError("");
     try {
@@ -43,6 +37,36 @@ function OrderDetail() {
       navigate("/orders", { replace: true });
     }
   }
+
+  useEffect(() => {
+    if (authLoading || !isLoggedIn || !Number.isInteger(id) || id < 1) {
+      return;
+    }
+
+    let isActive = true;
+
+    async function fetchInitialOrder() {
+      try {
+        const data = await getOrder(id);
+
+        if (isActive) {
+          setOrder(data.order);
+          setItems(data.items);
+        }
+      } catch (err) {
+        if (isActive) {
+          setError(err.message);
+          navigate("/orders", { replace: true });
+        }
+      }
+    }
+
+    fetchInitialOrder();
+
+    return () => {
+      isActive = false;
+    };
+  }, [authLoading, id, isLoggedIn, navigate]);
 
   async function updateStatus(status) {
     setBusy(true);

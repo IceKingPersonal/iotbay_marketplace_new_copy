@@ -7,6 +7,8 @@ import EditProfile from "./pages/EditProfile.jsx";
 import AccessLogs from "./pages/AccessLogs.jsx";
 import Devices from "./pages/Devices.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import Orders from "./pages/Orders.jsx";
+import OrderDetail from "./pages/OrderDetail.jsx";
 import Navbar from "./components/Navbar.jsx";
 
 function AppLayout({ children }) {
@@ -56,6 +58,15 @@ function App() {
         element={
           <AppLayout>
             <AccessLogs />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/devices"
+        element={
+          <AppLayout>
+            <Devices />
           </AppLayout>
         }
       />
