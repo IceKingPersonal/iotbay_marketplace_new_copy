@@ -6,6 +6,20 @@ from werkzeug.security import generate_password_hash
 DATABASE = "iotbay.db"
 
 
+DEVICE_CATEGORIES = [
+    "sensor",
+    "actuator",
+    "controller",
+    "gateway",
+    "camera",
+    "wearable",
+    "smart_home",
+    "industrial",
+    "accessory",
+    "other"
+]
+
+
 SAMPLE_DEVICES = [
     {
         "name": "Smart Temperature Sensor",
@@ -120,6 +134,21 @@ SAMPLE_DEVICES = [
 ]
 
 
+def validate_sample_device_category_coverage():
+    sample_categories = {device["category"] for device in SAMPLE_DEVICES}
+    missing_categories = [
+        category
+        for category in DEVICE_CATEGORIES
+        if category not in sample_categories
+    ]
+
+    if missing_categories:
+        missing_list = ", ".join(missing_categories)
+        raise ValueError(
+            f"SAMPLE_DEVICES is missing category seed data for: {missing_list}"
+        )
+
+
 def create_tables():
     connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
@@ -228,6 +257,8 @@ def create_tables():
 
 
 def insert_sample_data():
+    validate_sample_device_category_coverage()
+
     connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
 
