@@ -135,10 +135,10 @@ device category, condition, and status value used by the backend validation.
 
 ## Test Scripts
 
-The Python test scripts are located in the root-level test folder:
+The Python test scripts are located in the backend test folder:
 
 ```text
-tests
+backend/tests
 ```
 
 Run tests from a new third terminal after the backend and frontend are already
@@ -150,6 +150,12 @@ From the main project folder, activate the local virtual environment:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
+```
+
+Go into the backend folder:
+
+```powershell
+cd backend
 ```
 
 Run the full test suite:
@@ -170,7 +176,7 @@ Run the original combined Feature 02 test script:
 python -m pytest tests/test_feature02.py
 ```
 
-Run only the Feature 02 user-story tests:
+Run each Feature 02 user-story test script individually:
 
 ```powershell
 python -m pytest tests/test_feature02_story01_create_devices.py
