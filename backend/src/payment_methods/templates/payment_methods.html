@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Payment Methods</h2>
+
+<form method="GET" action="/payment-methods">
+    <input type="text" name="search" placeholder="Search by type..." value="{{ search }}">
+    <button type="submit">Search</button>
+</form>
+
+<a class="btn" href="/payment-methods/add">Add New Payment Method</a>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Card Number</th>
+        <th>BSB</th>
+        <th>Account Number</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for m in methods %}
+    <tr>
+        <td>{{ m.id }}</td>
+        <td>{{ m.type }}</td>
+        <td>{{ m.card_number or '-' }}</td>
+        <td>{{ m.bsb or '-' }}</td>
+        <td>{{ m.account_number or '-' }}</td>
+        <td>
+            <a href="/payment-methods/edit/{{ m.id }}">Edit</a>
+            <form action="/payment-methods/delete/{{ m.id }}" method="POST" style="display:inline;">
+                <button type="submit" onclick="return confirm('Delete this payment method?')">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

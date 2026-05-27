@@ -1,69 +1,120 @@
-## Backend Installation and Setup
+# IoT Bay — Marketplace prototype (R0)
 
-Open a terminal in the main project folder.
+Software prototype for the IoT Bay marketplace: a React (Vite) frontend and a Flask API with SQLite. Login and Register still perform **browser-side format checks**, then call **`POST /api/v1/users/bootstrap`** so the UI receives a **`user_uid`** for cart and order API calls (prototype auth uses the **`X-User-Id`** header, not production-grade sessions).
 
-Go into the backend folder:
+## Target branch
 
-```powershell
-cd backend
-```
+Use the "main" branch for this prototype.
 
-Install the backend dependencies:
+## Dependencies
 
-```powershell
-python -m venv .venv
-pip install -r requirements.txt
-```
+### Prerequisites
 
-Create the SQLite database:
+- Python 3.10 or newer
+- pip (bundled with Python)
+- Node.js 18+ and npm (frontend only)
 
-```powershell
-python init_db.py
-```
+### Frontend dependencies (`frontend/package.json`)
 
-Run the backend server:
+- `react`
+- `react-dom`
+- `react-router-dom`
+- `vite`
+- `eslint`
 
-```powershell
-python app.py
-```
+Install with:
 
-The backend should now be running at:
-
-```text
-http://127.0.0.1:5000
-```
-
----
-
-## Frontend Installation and Setup
-
-Open a second terminal in the main project folder.
-
-Go into the frontend folder:
-
-```powershell
+```bash
 cd frontend
-```
-
-Install the frontend dependencies:
-
-```powershell
 npm install
 ```
 
-Run the frontend development server:
+### Backend dependencies (`backend/requirements.txt`)
 
-```powershell
+- `flask`
+- `flask-cors`
+- SQLite is provided by Python's built-in `sqlite3` module (no extra package required)
+
+Install with:
+
+```bash
+cd backend
+python -m pip install -r requirements.txt
+```
+
+### Project structure
+
+| Area        | Stack                                      |
+| ----------- | ------------------------------------------ |
+| Frontend    | React 19, Vite 7, React Router |
+| Backend     | Flask 3, Python 3.10+, `sqlite3` (stdlib)  |
+| Database    | SQLite (file `backend/data/iotbay.db`)     |
+
+Install dependencies separately for each app (see below).
+
+## Run on localhost
+
+### 1. Clone and checkout
+
+```bash
+git clone "github.com/isd-2026/project-assignment-iotbay-marketplace-workshop04-group1"
+cd project-assignment-iotbay-marketplace-workshop04-group1
+git checkout main
+```
+
+### 2. Frontend (browser UI)
+
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-The frontend should now be running at:
+Open **http://localhost:5173**. Run the **backend** at the same time so Login/Register can bootstrap a user. **Vite proxies** `/api` → `http://localhost:3001` during `npm run dev` (see `frontend/vite.config.ts`). Use **Shop** → add to cart → **Cart** → checkout → **Orders** → open an order to try **PATCH**/**PUT** status updates.
 
-```text
-http://localhost:5173
+### 3. Backend (API + database)
+
+In a **second** terminal:
+
+```bash
+cd backend
+python -m pip install -r requirements.txt
+python app.py
 ```
 
----
+- API base: **http://localhost:3001**
+- Health: `GET http://localhost:3001/health`
+- DB check: `GET http://localhost:3001/api/db-check` — returns SQLite version when the file DB is connected
+
+On first run, the server creates `backend/data/` and `iotbay.db`, seeds demo products if the catalog is empty, then initializes schema tables from `backend/db.py`.
+
+### 4. Status / cart / orders API (summary)
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| POST | `/api/v1/users/bootstrap` | Create or return `user_uid` for an email |
+| GET | `/api/v1/products` | Demo catalog |
+| GET | `/api/v1/cart` | Current open cart + lines (`X-User-Id`) |
+| POST | `/api/v1/cart/items` | Add / merge line (`X-User-Id`) |
+| PATCH | `/api/v1/cart/items/:id` | Update line quantity |
+| DELETE | `/api/v1/cart/items/:id` | Remove line |
+| PATCH | `/api/v1/cart/:cartId` | Update cart `status` (`open` \| `checked_out` \| `abandoned`) |
+| POST | `/api/v1/cart/checkout` | Place order (`Saved` status, stock decremented) |
+| GET | `/api/v1/orders` | List orders for user |
+| GET | `/api/v1/orders/:orderId` | Order + device line items |
+| PATCH | `/api/v1/orders/:orderId` | Update status (`Saved` \| `Paid` \| `Cancelled`) |
+| PUT | `/api/v1/orders/:orderId` | Full replace: `shipping_address`, `total_price`, `currency`, `status` |
+
+Order `status` values: **Saved** (on placement), **Paid**, **Cancelled** (restores stock). Devices with 0 stock cannot be added to cart or ordered.
+
+### Ports
+
+| Service   | Port |
+| --------- | ---- |
+| Vite dev  | 5173 |
+| Flask     | 3001 |
+
+Override the API port with `PORT` (PowerShell: `$env:PORT=4000; python app.py` in `backend`). If you change the backend port, update `frontend/vite.config.ts` proxy `target` or set `VITE_API_BASE` to the full API origin.
 
 ## Running the Application
 
@@ -135,10 +186,10 @@ device category, condition, and status value used by the backend validation.
 
 ## Test Scripts
 
-The Python test scripts are located in the backend test folder:
+The Python test scripts are located in the root-level test folder:
 
 ```text
-backend/tests
+tests
 ```
 
 Run tests from a new third terminal after the backend and frontend are already
@@ -150,12 +201,6 @@ From the main project folder, activate the local virtual environment:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
-```
-
-Go into the backend folder:
-
-```powershell
-cd backend
 ```
 
 Run the full test suite:
@@ -176,7 +221,7 @@ Run the original combined Feature 02 test script:
 python -m pytest tests/test_feature02.py
 ```
 
-Run each Feature 02 user-story test script individually:
+Run only the Feature 02 user-story tests:
 
 ```powershell
 python -m pytest tests/test_feature02_story01_create_devices.py

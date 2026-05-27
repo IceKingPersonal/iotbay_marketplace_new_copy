@@ -192,6 +192,32 @@ def create_tables():
     """)
 
     cursor.execute("""
+        CREATE TABLE IF NOT EXISTS products (
+            product_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            device_name TEXT NOT NULL,
+            manufacturer TEXT,
+            type TEXT,
+            price INTEGER NOT NULL,
+            stock_qty INTEGER NOT NULL DEFAULT 0,
+            unit_type TEXT NOT NULL DEFAULT 'Each'
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            order_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            shipping_address TEXT NOT NULL,
+            total_price INTEGER NOT NULL,
+            currency TEXT NOT NULL DEFAULT 'AUD',
+            status TEXT NOT NULL DEFAULT 'Saved'
+                CHECK(status IN ('Saved', 'Paid', 'Cancelled')),
+            created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+    """)
+    
+    cursor.execute("""            
         CREATE TABLE IF NOT EXISTS devices (
             device_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
@@ -235,6 +261,18 @@ def create_tables():
     """)
 
     cursor.execute("""
+        CREATE TABLE IF NOT EXISTS order_items (
+            order_item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id INTEGER NOT NULL,
+            product_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            unit_price INTEGER NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES orders(order_id),
+            FOREIGN KEY (product_id) REFERENCES products(product_id)
+        )    
+    """)    
+       
+    cursor.execute(""" 
         CREATE TABLE IF NOT EXISTS device_audit_logs (
             audit_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
@@ -254,7 +292,6 @@ def create_tables():
 
     connection.commit()
     connection.close()
-
 
 def insert_sample_data():
     validate_sample_device_category_coverage()
@@ -362,7 +399,25 @@ def insert_sample_data():
             staff_user_id,
             staff_user_id
         ))
-
+        
+    sample_products = [
+        ("Moisture U7 Sensor", "Ubiquiti", "Sensor", 2049, 50),
+        ("DC Motor Kit 12V", "SparkFun", "DC Motors", 4999, 30),
+        ("LoRa Gateway Pro", "RAK", "Gateway", 18900, 10),
+    ]
+    
+    for product in sample_products:
+        try:
+            cursor.execute(
+                """
+                INSERT INTO products (device_name, manufacturer, type, price, stock_qty)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                product,
+            )
+        except sqlite3.IntegrityError:
+            pass
+        
     connection.commit()
     connection.close()
 
