@@ -14,6 +14,7 @@ function Navbar() {
     <nav className="navbar">
       <div className="navbar-left">
         <Link to="/dashboard">Dashboard</Link>
+        <Link to="/devices">Devices</Link>
         <Link to="/profile">View Profile</Link>
         <Link to="/edit">Edit Profile</Link>
       </div>

@@ -6,6 +6,149 @@ from werkzeug.security import generate_password_hash
 DATABASE = "iotbay.db"
 
 
+DEVICE_CATEGORIES = [
+    "sensor",
+    "actuator",
+    "controller",
+    "gateway",
+    "camera",
+    "wearable",
+    "smart_home",
+    "industrial",
+    "accessory",
+    "other"
+]
+
+
+SAMPLE_DEVICES = [
+    {
+        "name": "Smart Temperature Sensor",
+        "category": "sensor",
+        "brand": "IoTBay",
+        "model": "SEN-TEMP-100",
+        "description": "Wireless sensor for room temperature monitoring.",
+        "price": 49.99,
+        "stock_quantity": 25,
+        "condition": "new",
+        "status": "active"
+    },
+    {
+        "name": "Valve Control Actuator",
+        "category": "actuator",
+        "brand": "ActuaTech",
+        "model": "ACT-VALVE-200",
+        "description": "Remote valve actuator for water systems.",
+        "price": 89.50,
+        "stock_quantity": 12,
+        "condition": "used",
+        "status": "active"
+    },
+    {
+        "name": "Edge Logic Controller",
+        "category": "controller",
+        "brand": "ControlWorks",
+        "model": "CTRL-EDGE-300",
+        "description": "Programmable controller for local IoT automation.",
+        "price": 149.00,
+        "stock_quantity": 8,
+        "condition": "refurbished",
+        "status": "active"
+    },
+    {
+        "name": "Long Range IoT Gateway",
+        "category": "gateway",
+        "brand": "Gateway Labs",
+        "model": "GATE-LORA-400",
+        "description": "Gateway for long range industrial network coverage.",
+        "price": 219.99,
+        "stock_quantity": 5,
+        "condition": "new",
+        "status": "inactive"
+    },
+    {
+        "name": "Outdoor Security Camera",
+        "category": "camera",
+        "brand": "SecureView",
+        "model": "CAM-OUT-500",
+        "description": "Weather resistant connected camera.",
+        "price": 129.95,
+        "stock_quantity": 0,
+        "condition": "used",
+        "status": "archived"
+    },
+    {
+        "name": "Health Band Wearable",
+        "category": "wearable",
+        "brand": "WearSense",
+        "model": "WEAR-HB-600",
+        "description": "Wearable device for health telemetry.",
+        "price": 79.00,
+        "stock_quantity": 18,
+        "condition": "refurbished",
+        "status": "active"
+    },
+    {
+        "name": "Smart Home Hub",
+        "category": "smart_home",
+        "brand": "HomeMesh",
+        "model": "HOME-HUB-700",
+        "description": "Hub for smart home device orchestration.",
+        "price": 99.00,
+        "stock_quantity": 30,
+        "condition": "new",
+        "status": "active"
+    },
+    {
+        "name": "Industrial Vibration Monitor",
+        "category": "industrial",
+        "brand": "PlantSense",
+        "model": "IND-VIB-800",
+        "description": "Industrial monitor for machine vibration data.",
+        "price": 189.00,
+        "stock_quantity": 9,
+        "condition": "used",
+        "status": "active"
+    },
+    {
+        "name": "Mounting Accessory Kit",
+        "category": "accessory",
+        "brand": "InstallPro",
+        "model": "ACC-MOUNT-900",
+        "description": "Mounting hardware for IoT devices.",
+        "price": 19.99,
+        "stock_quantity": 40,
+        "condition": "refurbished",
+        "status": "inactive"
+    },
+    {
+        "name": "Prototype IoT Device",
+        "category": "other",
+        "brand": "IoTBay",
+        "model": "OTHER-PROTO-1000",
+        "description": "Archived prototype record for testing catalogue status.",
+        "price": 59.00,
+        "stock_quantity": 0,
+        "condition": "new",
+        "status": "archived"
+    }
+]
+
+
+def validate_sample_device_category_coverage():
+    sample_categories = {device["category"] for device in SAMPLE_DEVICES}
+    missing_categories = [
+        category
+        for category in DEVICE_CATEGORIES
+        if category not in sample_categories
+    ]
+
+    if missing_categories:
+        missing_list = ", ".join(missing_categories)
+        raise ValueError(
+            f"SAMPLE_DEVICES is missing category seed data for: {missing_list}"
+        )
+
+
 def create_tables():
     connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
@@ -48,11 +191,74 @@ def create_tables():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS devices (
+            device_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            name TEXT NOT NULL,
+            category TEXT NOT NULL
+                CHECK(category IN (
+                    'sensor',
+                    'actuator',
+                    'controller',
+                    'gateway',
+                    'camera',
+                    'wearable',
+                    'smart_home',
+                    'industrial',
+                    'accessory',
+                    'other'
+                )),
+            brand TEXT NOT NULL,
+            model TEXT NOT NULL,
+            description TEXT,
+
+            price REAL NOT NULL CHECK(price >= 0),
+            stock_quantity INTEGER NOT NULL DEFAULT 0
+                CHECK(stock_quantity >= 0),
+
+            condition TEXT NOT NULL DEFAULT 'new'
+                CHECK(condition IN ('new', 'used', 'refurbished')),
+
+            status TEXT NOT NULL DEFAULT 'active'
+                CHECK(status IN ('active', 'inactive', 'archived')),
+
+            created_by INTEGER,
+            updated_by INTEGER,
+
+            created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+
+            FOREIGN KEY (created_by) REFERENCES users(user_id),
+            FOREIGN KEY (updated_by) REFERENCES users(user_id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS device_audit_logs (
+            audit_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            device_id INTEGER NOT NULL,
+            staff_user_id INTEGER NOT NULL,
+
+            action TEXT NOT NULL
+                CHECK(action IN ('created', 'updated', 'deleted')),
+            details TEXT,
+
+            created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+
+            FOREIGN KEY (device_id) REFERENCES devices(device_id),
+            FOREIGN KEY (staff_user_id) REFERENCES users(user_id)
+        )
+    """)
+
     connection.commit()
     connection.close()
 
 
 def insert_sample_data():
+    validate_sample_device_category_coverage()
+
     connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
 
@@ -105,6 +311,57 @@ def insert_sample_data():
             ))
         except sqlite3.IntegrityError:
             pass
+
+    staff_user = cursor.execute("""
+        SELECT user_id
+        FROM users
+        WHERE email = ?
+    """, ("staff@test.com",)).fetchone()
+
+    staff_user_id = staff_user[0] if staff_user else None
+
+    for device in SAMPLE_DEVICES:
+        existing_device = cursor.execute("""
+            SELECT device_id
+            FROM devices
+            WHERE name = ?
+              AND model = ?
+        """, (
+            device["name"],
+            device["model"]
+        )).fetchone()
+
+        if existing_device:
+            continue
+
+        cursor.execute("""
+            INSERT INTO devices (
+                name,
+                category,
+                brand,
+                model,
+                description,
+                price,
+                stock_quantity,
+                condition,
+                status,
+                created_by,
+                updated_by
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            device["name"],
+            device["category"],
+            device["brand"],
+            device["model"],
+            device["description"],
+            device["price"],
+            device["stock_quantity"],
+            device["condition"],
+            device["status"],
+            staff_user_id,
+            staff_user_id
+        ))
 
     connection.commit()
     connection.close()
