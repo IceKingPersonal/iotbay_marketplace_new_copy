@@ -443,54 +443,6 @@ def insert_sample_data(database=None):
 
     staff_user_id = staff_user[0] if staff_user else None
 
-    #sample_products = [
-    #    ("Moisture U7 Sensor", "Ubiquiti", "sensor", "U7", 2049, 50),
-    #    ("DC Motor Kit 12V", "SparkFun", "actuator", "DC-12V", 4999, 30),
-    #    ("LoRa Gateway Pro", "RAK", "gateway", "LORA-PRO", 18900, 10),
-    #]
-
-    #for product in sample_products:
-    #   existing_product = cursor.execute(
-    #        """
-    #       SELECT product_id
-    #        FROM products
-    #        WHERE device_name = ?
-    #          AND model = ?
-    #        """,
-    #        (product[0], product[3]),
-    #    ).fetchone()
-
-    #    if existing_product:
-    #        continue
-
-    #   cursor.execute(
-    #        """
-    #        INSERT INTO products (
-    #            device_name,
-    #            manufacturer,
-    #            type,
-    #            model,
-    #            price,
-    #            stock_qty,
-    #            condition,
-    #            status,
-    #            created_by,
-    #            updated_by
-    #        )
-    #        VALUES (?, ?, ?, ?, ?, ?, 'new', 'active', ?, ?)
-    #        """,
-    #       (
-    #           product[0],
-    #           product[1],
-    #           product[2],
-    #           product[3],
-    #            product[4],
-    #            product[5],
-    #            staff_user_id,
-    #            staff_user_id,
-    #        ),
-    #    )
-
     for device in SAMPLE_DEVICES:
         existing_device = cursor.execute(
             """
@@ -536,9 +488,9 @@ def insert_sample_data(database=None):
         ))
         
     sample_products = [
-        ("Moisture U7 Sensor", "Ubiquiti", "Sensor", 2049, 50),
-        ("DC Motor Kit 12V", "SparkFun", "DC Motors", 4999, 30),
-        ("LoRa Gateway Pro", "RAK", "Gateway", 18900, 10),
+        ("Moisture U7 Sensor", "Ubiquiti", "sensor", 2049, 50),
+        ("DC Motor Kit 12V", "SparkFun", "actuator", 4999, 30),
+        ("LoRa Gateway Pro", "RAK", "gateway", 18900, 10),
     ]
     
     for product in sample_products:
@@ -548,6 +500,7 @@ def insert_sample_data(database=None):
             WHERE device_name = ?
               AND manufacturer = ?
               AND type = ?
+              AND model IS NULL
         """, product[:3]).fetchone()
 
         if existing_product:
