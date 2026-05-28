@@ -38,6 +38,7 @@ def login():
         return jsonify({"error": error}), status_code
 
     session["user_id"] = user["user_id"]
+    session["role"] = user["role"]
 
     log_id = AccessLogModel.create_login_log(user["user_id"])
     session["access_log_id"] = log_id

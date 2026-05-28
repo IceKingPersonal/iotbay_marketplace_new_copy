@@ -68,53 +68,34 @@ def app():
         """)
 
         cursor.execute("""
-            CREATE TABLE devices (
-                device_id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-                name TEXT NOT NULL,
-                category TEXT NOT NULL
-                    CHECK(category IN (
-                        'sensor',
-                        'actuator',
-                        'controller',
-                        'gateway',
-                        'camera',
-                        'wearable',
-                        'smart_home',
-                        'industrial',
-                        'accessory',
-                        'other'
-                    )),
-                brand TEXT NOT NULL,
-                model TEXT NOT NULL,
+            CREATE TABLE products (
+                product_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                device_name TEXT NOT NULL,
+                manufacturer TEXT,
+                type TEXT,
+                model TEXT,
                 description TEXT,
-
-                price REAL NOT NULL CHECK(price >= 0),
-                stock_quantity INTEGER NOT NULL DEFAULT 0
-                    CHECK(stock_quantity >= 0),
-
+                price INTEGER NOT NULL,
+                stock_qty INTEGER NOT NULL DEFAULT 0,
+                unit_type TEXT NOT NULL DEFAULT 'Each',
                 condition TEXT NOT NULL DEFAULT 'new'
                     CHECK(condition IN ('new', 'used', 'refurbished')),
-
                 status TEXT NOT NULL DEFAULT 'active'
                     CHECK(status IN ('active', 'inactive', 'archived')),
-
                 created_by INTEGER,
                 updated_by INTEGER,
-
                 created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
                 updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
-
                 FOREIGN KEY (created_by) REFERENCES users(user_id),
                 FOREIGN KEY (updated_by) REFERENCES users(user_id)
             )
         """)
 
         cursor.execute("""
-            CREATE TABLE device_audit_logs (
+            CREATE TABLE product_audit_logs (
                 audit_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-                device_id INTEGER NOT NULL,
+                product_id INTEGER NOT NULL,
                 staff_user_id INTEGER NOT NULL,
 
                 action TEXT NOT NULL
@@ -123,7 +104,7 @@ def app():
 
                 created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
 
-                FOREIGN KEY (device_id) REFERENCES devices(device_id),
+                FOREIGN KEY (product_id) REFERENCES products(product_id),
                 FOREIGN KEY (staff_user_id) REFERENCES users(user_id)
             )
         """)
@@ -227,14 +208,14 @@ def insert_device(**overrides):
     connection = sqlite3.connect(TEST_DATABASE)
     cursor = connection.cursor()
     cursor.execute("""
-        INSERT INTO devices (
-            name,
-            category,
-            brand,
+        INSERT INTO products (
+            device_name,
+            type,
+            manufacturer,
             model,
             description,
             price,
-            stock_quantity,
+            stock_qty,
             condition,
             status,
             created_by,
@@ -247,7 +228,7 @@ def insert_device(**overrides):
         data["brand"],
         data["model"],
         data["description"],
-        data["price"],
+        int(round(float(data["price"]) * 100)),
         data["stock_quantity"],
         data["condition"],
         data["status"],
@@ -266,8 +247,8 @@ def get_device(device_id):
     connection.row_factory = sqlite3.Row
     device = connection.execute("""
         SELECT *
-        FROM devices
-        WHERE device_id = ?
+        FROM products
+        WHERE product_id = ?
     """, (device_id,)).fetchone()
     connection.close()
 
@@ -402,7 +383,7 @@ def test_api_staff_can_update_device(client):
 
     assert response.status_code == 200
     assert body["device"]["name"] == "Updated Sensor"
-    assert device["price"] == 59.5
+    assert device["price"] == 5950
     assert device["updated_by"] == 2
 
 

@@ -43,13 +43,13 @@ def test_unit_model_create_persists_staff_creator_and_audit_log(
 
     device = query_one("""
         SELECT *
-        FROM devices
-        WHERE device_id = ?
+        FROM products
+        WHERE product_id = ?
     """, (device_id,))
     audit_log = query_one("""
         SELECT *
-        FROM device_audit_logs
-        WHERE device_id = ?
+        FROM product_audit_logs
+        WHERE product_id = ?
           AND action = 'created'
     """, (device_id,))
 

@@ -1,76 +1,88 @@
 from database import get_db
 
 
-class DeviceModel:
+def _price_to_cents(price):
+    return int(round(float(price) * 100))
 
+
+def _price_to_dollars(cents):
+    return round(int(cents) / 100, 2)
+
+
+class DeviceModel:
     @staticmethod
     def create_device(data, staff_user_id):
         db = get_db()
 
-        cursor = db.execute("""
-            INSERT INTO devices (
-                name,
-                category,
-                brand,
+        cursor = db.execute(
+            """
+            INSERT INTO products (
+                device_name,
+                type,
+                manufacturer,
                 model,
                 description,
                 price,
-                stock_quantity,
+                stock_qty,
                 condition,
                 status,
                 created_by,
                 updated_by
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            data.get("name"),
-            data.get("category"),
-            data.get("brand"),
-            data.get("model"),
-            data.get("description"),
-            data.get("price"),
-            data.get("stock_quantity"),
-            data.get("condition"),
-            data.get("status"),
-            staff_user_id,
-            staff_user_id
-        ))
+            """,
+            (
+                data.get("name"),
+                data.get("category"),
+                data.get("brand"),
+                data.get("model"),
+                data.get("description"),
+                _price_to_cents(data.get("price")),
+                data.get("stock_quantity"),
+                data.get("condition"),
+                data.get("status"),
+                staff_user_id,
+                staff_user_id,
+            ),
+        )
 
-        device_id = cursor.lastrowid
+        product_id = cursor.lastrowid
         DeviceModel.create_audit_log(
-            device_id,
+            product_id,
             staff_user_id,
             "created",
-            "Device created."
+            "Device created.",
         )
 
         db.commit()
-        return device_id
+        return product_id
 
     @staticmethod
     def find_by_id(device_id):
         db = get_db()
 
-        device = db.execute("""
+        return db.execute(
+            """
             SELECT *
-            FROM devices
-            WHERE device_id = ?
-        """, (device_id,)).fetchone()
-
-        return device
+            FROM products
+            WHERE product_id = ?
+            """,
+            (device_id,),
+        ).fetchone()
 
     @staticmethod
     def find_by_ids(device_ids):
         db = get_db()
         placeholders = ", ".join(["?"] * len(device_ids))
 
-        devices = db.execute(f"""
+        return db.execute(
+            f"""
             SELECT *
-            FROM devices
-            WHERE device_id IN ({placeholders})
-        """, device_ids).fetchall()
-
-        return devices
+            FROM products
+            WHERE product_id IN ({placeholders})
+            """,
+            device_ids,
+        ).fetchall()
 
     @staticmethod
     def list_devices(filters):
@@ -78,7 +90,7 @@ class DeviceModel:
 
         query = """
             SELECT *
-            FROM devices
+            FROM products
             WHERE status = 'active'
         """
         values = []
@@ -86,28 +98,22 @@ class DeviceModel:
         if filters.get("search"):
             query += """
                 AND (
-                    name LIKE ?
-                    OR category LIKE ?
-                    OR brand LIKE ?
+                    device_name LIKE ?
+                    OR type LIKE ?
+                    OR manufacturer LIKE ?
                     OR model LIKE ?
                     OR description LIKE ?
                 )
             """
             search_value = f"%{filters.get('search')}%"
-            values.extend([
-                search_value,
-                search_value,
-                search_value,
-                search_value,
-                search_value
-            ])
+            values.extend([search_value] * 5)
 
         if filters.get("category"):
-            query += " AND category = ?"
+            query += " AND type = ?"
             values.append(filters.get("category"))
 
         if filters.get("brand"):
-            query += " AND brand LIKE ?"
+            query += " AND manufacturer LIKE ?"
             values.append(f"%{filters.get('brand')}%")
 
         if filters.get("condition"):
@@ -116,61 +122,62 @@ class DeviceModel:
 
         if filters.get("min_price") is not None:
             query += " AND price >= ?"
-            values.append(filters.get("min_price"))
+            values.append(_price_to_cents(filters.get("min_price")))
 
         if filters.get("max_price") is not None:
             query += " AND price <= ?"
-            values.append(filters.get("max_price"))
+            values.append(_price_to_cents(filters.get("max_price")))
 
         if filters.get("in_stock"):
-            query += " AND stock_quantity > 0"
+            query += " AND stock_qty > 0"
 
         query += """
-            ORDER BY name ASC,
-                     device_id ASC
+            ORDER BY device_name ASC,
+                     product_id ASC
         """
 
-        devices = db.execute(query, values).fetchall()
-
-        return devices
+        return db.execute(query, values).fetchall()
 
     @staticmethod
     def update_device(device_id, data, staff_user_id):
         db = get_db()
 
-        db.execute("""
-            UPDATE devices
-            SET name = ?,
-                category = ?,
-                brand = ?,
+        db.execute(
+            """
+            UPDATE products
+            SET device_name = ?,
+                type = ?,
+                manufacturer = ?,
                 model = ?,
                 description = ?,
                 price = ?,
-                stock_quantity = ?,
+                stock_qty = ?,
                 condition = ?,
                 status = ?,
                 updated_by = ?,
                 updated_at = datetime('now', 'localtime')
-            WHERE device_id = ?
-        """, (
-            data.get("name"),
-            data.get("category"),
-            data.get("brand"),
-            data.get("model"),
-            data.get("description"),
-            data.get("price"),
-            data.get("stock_quantity"),
-            data.get("condition"),
-            data.get("status"),
-            staff_user_id,
-            device_id
-        ))
+            WHERE product_id = ?
+            """,
+            (
+                data.get("name"),
+                data.get("category"),
+                data.get("brand"),
+                data.get("model"),
+                data.get("description"),
+                _price_to_cents(data.get("price")),
+                data.get("stock_quantity"),
+                data.get("condition"),
+                data.get("status"),
+                staff_user_id,
+                device_id,
+            ),
+        )
 
         DeviceModel.create_audit_log(
             device_id,
             staff_user_id,
             "updated",
-            "Device updated."
+            "Device updated.",
         )
 
         db.commit()
@@ -180,22 +187,22 @@ class DeviceModel:
     def delete_device(device_id, staff_user_id):
         db = get_db()
 
-        db.execute("""
-            UPDATE devices
+        db.execute(
+            """
+            UPDATE products
             SET status = 'archived',
                 updated_by = ?,
                 updated_at = datetime('now', 'localtime')
-            WHERE device_id = ?
-        """, (
-            staff_user_id,
-            device_id
-        ))
+            WHERE product_id = ?
+            """,
+            (staff_user_id, device_id),
+        )
 
         DeviceModel.create_audit_log(
             device_id,
             staff_user_id,
             "deleted",
-            "Device archived."
+            "Device archived.",
         )
 
         db.commit()
@@ -206,80 +213,81 @@ class DeviceModel:
         db = get_db()
 
         for device_id in device_ids:
-            db.execute("""
-                UPDATE devices
+            db.execute(
+                """
+                UPDATE products
                 SET status = 'archived',
                     updated_by = ?,
                     updated_at = datetime('now', 'localtime')
-                WHERE device_id = ?
-            """, (
-                staff_user_id,
-                device_id
-            ))
+                WHERE product_id = ?
+                """,
+                (staff_user_id, device_id),
+            )
 
             DeviceModel.create_audit_log(
                 device_id,
                 staff_user_id,
                 "deleted",
-                "Device archived."
+                "Device archived.",
             )
 
         db.commit()
         return device_ids
 
     @staticmethod
-    def create_audit_log(device_id, staff_user_id, action, details):
+    def create_audit_log(product_id, staff_user_id, action, details):
         db = get_db()
 
-        db.execute("""
-            INSERT INTO device_audit_logs (
-                device_id,
+        db.execute(
+            """
+            INSERT INTO product_audit_logs (
+                product_id,
                 staff_user_id,
                 action,
                 details
             )
             VALUES (?, ?, ?, ?)
-        """, (
-            device_id,
-            staff_user_id,
-            action,
-            details
-        ))
+            """,
+            (product_id, staff_user_id, action, details),
+        )
 
     @staticmethod
     def find_audit_logs_by_device_id(device_id):
         db = get_db()
 
-        logs = db.execute("""
+        return db.execute(
+            """
             SELECT *
-            FROM device_audit_logs
-            WHERE device_id = ?
+            FROM product_audit_logs
+            WHERE product_id = ?
             ORDER BY created_at DESC,
                      audit_id DESC
-        """, (device_id,)).fetchall()
-
-        return logs
+            """,
+            (device_id,),
+        ).fetchall()
 
     @staticmethod
-    def to_dict(device):
-        if device is None:
+    def to_dict(product):
+        if product is None:
             return None
 
+        row_keys = product.keys()
+
         return {
-            "device_id": device["device_id"],
-            "name": device["name"],
-            "category": device["category"],
-            "brand": device["brand"],
-            "model": device["model"],
-            "description": device["description"],
-            "price": device["price"],
-            "stock_quantity": device["stock_quantity"],
-            "condition": device["condition"],
-            "status": device["status"],
-            "created_by": device["created_by"],
-            "updated_by": device["updated_by"],
-            "created_at": device["created_at"],
-            "updated_at": device["updated_at"]
+            "device_id": product["product_id"],
+            "name": product["device_name"],
+            "category": product["type"],
+            "brand": product["manufacturer"],
+            "model": product["model"] if "model" in row_keys else None,
+            "description": product["description"] if "description" in row_keys else None,
+            "price": _price_to_dollars(product["price"]),
+            "stock_quantity": product["stock_qty"],
+            "condition": product["condition"] if "condition" in row_keys else "new",
+            "status": product["status"] if "status" in row_keys else "active",
+            "created_by": product["created_by"] if "created_by" in row_keys else None,
+            "updated_by": product["updated_by"] if "updated_by" in row_keys else None,
+            "created_at": product["created_at"] if "created_at" in row_keys else None,
+            "updated_at": product["updated_at"] if "updated_at" in row_keys else None,
         }
 
     @staticmethod
@@ -290,11 +298,11 @@ class DeviceModel:
     def audit_to_dict(log):
         return {
             "audit_id": log["audit_id"],
-            "device_id": log["device_id"],
+            "device_id": log["product_id"],
             "staff_user_id": log["staff_user_id"],
             "action": log["action"],
             "details": log["details"],
-            "created_at": log["created_at"]
+            "created_at": log["created_at"],
         }
 
     @staticmethod

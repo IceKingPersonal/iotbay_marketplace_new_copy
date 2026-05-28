@@ -38,19 +38,19 @@ def test_unit_model_update_changes_record_and_writes_audit_log(
 
     device = query_one("""
         SELECT *
-        FROM devices
-        WHERE device_id = ?
+        FROM products
+        WHERE product_id = ?
     """, (device_id,))
     audit_log = query_one("""
         SELECT *
-        FROM device_audit_logs
-        WHERE device_id = ?
+        FROM product_audit_logs
+        WHERE product_id = ?
           AND action = 'updated'
     """, (device_id,))
 
-    assert device["name"] == "Unit Updated Sensor"
-    assert device["price"] == 66.25
-    assert device["stock_quantity"] == 7
+    assert device["device_name"] == "Unit Updated Sensor"
+    assert device["price"] == 6625
+    assert device["stock_qty"] == 7
     assert audit_log["staff_user_id"] == 2
 
 

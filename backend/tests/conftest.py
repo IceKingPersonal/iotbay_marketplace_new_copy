@@ -115,14 +115,14 @@ def insert_device(app, valid_device_payload):
         connection = sqlite3.connect(TEST_DATABASE)
         cursor = connection.cursor()
         cursor.execute("""
-            INSERT INTO devices (
-                name,
-                category,
-                brand,
+            INSERT INTO products (
+                device_name,
+                type,
+                manufacturer,
                 model,
                 description,
                 price,
-                stock_quantity,
+                stock_qty,
                 condition,
                 status,
                 created_by,
@@ -135,7 +135,7 @@ def insert_device(app, valid_device_payload):
             data["brand"],
             data["model"],
             data["description"],
-            data["price"],
+            int(round(float(data["price"]) * 100)),
             data["stock_quantity"],
             data["condition"],
             data["status"],
@@ -156,8 +156,8 @@ def get_device(query_one):
     def _get(device_id):
         return query_one("""
             SELECT *
-            FROM devices
-            WHERE device_id = ?
+            FROM products
+            WHERE product_id = ?
         """, (device_id,))
 
     return _get

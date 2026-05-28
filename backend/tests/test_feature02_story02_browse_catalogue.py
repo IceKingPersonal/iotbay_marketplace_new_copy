@@ -10,8 +10,8 @@ from utils.validators import DEVICE_CATEGORIES, DEVICE_CONDITIONS, DEVICE_STATUS
 def test_unit_seed_devices_cover_all_catalogue_enums(query_all):
     """Unit: seeded devices cover every category, condition, and status enum."""
     rows = query_all("""
-        SELECT category, condition, status
-        FROM devices
+        SELECT type AS category, condition, status
+        FROM products
     """)
 
     categories = {row["category"] for row in rows}
@@ -21,7 +21,7 @@ def test_unit_seed_devices_cover_all_catalogue_enums(query_all):
     assert categories == set(DEVICE_CATEGORIES)
     assert conditions == set(DEVICE_CONDITIONS)
     assert statuses == set(DEVICE_STATUSES)
-    assert len(rows) == len(SAMPLE_DEVICES)
+    assert len(rows) == len(SAMPLE_DEVICES) + 3
 
 
 def test_unit_model_list_devices_returns_only_active_records(app):
@@ -44,7 +44,7 @@ def test_api_customer_can_browse_active_device_catalogue(
     body = response.get_json()
 
     assert response.status_code == 200
-    assert len(body["devices"]) == 6
+    assert len(body["devices"]) == 11
     assert all(device["status"] == "active" for device in body["devices"])
     assert {"name", "category", "price", "stock_quantity"}.issubset(
         body["devices"][0].keys()
@@ -59,7 +59,7 @@ def test_api_staff_can_browse_active_device_catalogue(client, login_as_staff):
     body = response.get_json()
 
     assert response.status_code == 200
-    assert len(body["devices"]) == 6
+    assert len(body["devices"]) == 11
     assert all(device["status"] == "active" for device in body["devices"])
 
 

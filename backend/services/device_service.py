@@ -83,6 +83,26 @@ def sanitize_device_ids(data):
     return sanitized_ids, None
 
 
+def _existing_value(existing_device, *keys, default=None):
+    if existing_device is None:
+        return default
+
+    row_keys = existing_device.keys()
+    for key in keys:
+        if key in row_keys and existing_device[key] is not None:
+            return existing_device[key]
+
+    return default
+
+
+def _existing_price_dollars(existing_device):
+    raw_price = _existing_value(existing_device, "price")
+    if raw_price is None:
+        return None
+
+    return round(int(raw_price) / 100, 2)
+
+
 def sanitize_device_data(data, existing_device=None):
     sanitized_data = {}
 
@@ -95,17 +115,17 @@ def sanitize_device_data(data, existing_device=None):
     status = normalize_option(data.get("status"))
 
     if existing_device is not None:
-        name = name if name is not None else existing_device["name"]
-        category = category if category is not None else existing_device["category"]
-        brand = brand if brand is not None else existing_device["brand"]
-        model = model if model is not None else existing_device["model"]
+        name = name if name is not None else _existing_value(existing_device, "name", "device_name")
+        category = category if category is not None else _existing_value(existing_device, "category", "type")
+        brand = brand if brand is not None else _existing_value(existing_device, "brand", "manufacturer")
+        model = model if model is not None else _existing_value(existing_device, "model")
         description = (
             description
             if description is not None
-            else existing_device["description"]
+            else _existing_value(existing_device, "description")
         )
-        condition = condition if condition is not None else existing_device["condition"]
-        status = status if status is not None else existing_device["status"]
+        condition = condition if condition is not None else _existing_value(existing_device, "condition")
+        status = status if status is not None else _existing_value(existing_device, "status")
 
     if not name:
         return None, "Device name is required."
@@ -136,7 +156,7 @@ def sanitize_device_data(data, existing_device=None):
         if error:
             return None, error
     elif existing_device is not None:
-        price = existing_device["price"]
+        price = _existing_price_dollars(existing_device)
     else:
         return None, "Price is required."
 
@@ -151,7 +171,12 @@ def sanitize_device_data(data, existing_device=None):
         if error:
             return None, error
     elif existing_device is not None:
-        stock_quantity = existing_device["stock_quantity"]
+        stock_quantity = _existing_value(
+            existing_device,
+            "stock_quantity",
+            "stock_qty",
+            default=0,
+        )
     else:
         stock_quantity = 0
 
@@ -335,7 +360,7 @@ def bulk_delete_devices(data, user):
         return None, error, 400
 
     existing_devices = DeviceModel.find_by_ids(device_ids)
-    existing_device_ids = [device["device_id"] for device in existing_devices]
+    existing_device_ids = [device["product_id"] for device in existing_devices]
     missing_device_ids = [
         device_id
         for device_id in device_ids
