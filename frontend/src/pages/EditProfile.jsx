@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiRequest } from "../api/apiClient.js";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 
 function EditProfile() {
   const navigate = useNavigate();
@@ -45,10 +45,6 @@ function EditProfile() {
 
     if (!authLoading && isLoggedIn) {
       fetchProfile();
-    }
-
-    if (!authLoading && !isLoggedIn) {
-      setLoading(false);
     }
   }, [authLoading, isLoggedIn]);
 

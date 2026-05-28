@@ -1,8 +1,7 @@
 //Stores and shares authentication state across React app. E.g. allows pages to check if a user is logged in or not.
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { apiRequest } from "../api/apiClient";
-
-const AuthContext = createContext(null);
+import { AuthContext } from "./AuthContextValue.js";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -12,7 +11,7 @@ export function AuthProvider({ children }) {
     try {
       const data = await apiRequest("/auth/me");
       setUser(data.user);
-    } catch (error) {
+    } catch {
       setUser(null);
     } finally {
       setLoading(false);
@@ -20,7 +19,31 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    checkCurrentUser();
+    let isActive = true;
+
+    async function loadCurrentUser() {
+      try {
+        const data = await apiRequest("/auth/me");
+
+        if (isActive) {
+          setUser(data.user);
+        }
+      } catch {
+        if (isActive) {
+          setUser(null);
+        }
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadCurrentUser();
+
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   function login(userData) {
@@ -49,8 +72,4 @@ export function AuthProvider({ children }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
 }

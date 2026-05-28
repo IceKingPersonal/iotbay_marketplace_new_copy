@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { listOrders } from "../api/orders.js";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 
 function formatMoney(cents) {
   return (cents / 100).toFixed(2);
@@ -21,7 +21,7 @@ function Orders() {
   const [orders, setOrders] = useState([]);
   const [orderIdQuery, setOrderIdQuery] = useState("");
   const [dateQuery, setDateQuery] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   async function fetchOrders(filters = {}) {
@@ -39,9 +39,36 @@ function Orders() {
   }
 
   useEffect(() => {
-    if (!authLoading && isLoggedIn) {
-      fetchOrders();
+    if (authLoading || !isLoggedIn) {
+      return;
     }
+
+    let isActive = true;
+
+    async function fetchInitialOrders() {
+      try {
+        const data = await listOrders();
+
+        if (isActive) {
+          setOrders(data.orders);
+        }
+      } catch (err) {
+        if (isActive) {
+          setError(err.message);
+          setOrders([]);
+        }
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchInitialOrders();
+
+    return () => {
+      isActive = false;
+    };
   }, [authLoading, isLoggedIn]);
 
   function handleSearch(event) {
@@ -97,8 +124,15 @@ function Orders() {
         <p>
           {isStaff
             ? "View all customer orders (read-only)."
-            : "New orders start as Saved. Search by order ID or date."}
+            : "Create a new order or search your existing Saved, Paid, and Cancelled orders."}
         </p>
+        {!isStaff ? (
+          <p>
+            <Link className="btn btn-primary" to="/orders/new">
+              Create order
+            </Link>
+          </p>
+        ) : null}
       </div>
 
       {!isStaff ? (

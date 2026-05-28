@@ -1,9 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 
 function Navbar() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   async function handleLogout() {
     await logout();
@@ -17,6 +17,10 @@ function Navbar() {
         <Link to="/devices">Devices</Link>
         <Link to="/profile">View Profile</Link>
         <Link to="/edit">Edit Profile</Link>
+        {user?.role === "customer" && (
+          <Link to="/payments/create">Make Payment</Link>
+        )}
+        <Link to="/payments/history">Payment History</Link>
       </div>
 
       <div className="navbar-center">IOTA Marketplace</div>

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../api/apiClient.js";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 
 function Profile() {
   const { isLoggedIn, loading: authLoading } = useAuth();
@@ -25,10 +25,6 @@ function Profile() {
 
     if (!authLoading && isLoggedIn) {
       fetchProfile();
-    }
-
-    if (!authLoading && !isLoggedIn) {
-      setLoading(false);
     }
   }, [authLoading, isLoggedIn]);
 

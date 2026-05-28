@@ -7,7 +7,16 @@ import EditProfile from "./pages/EditProfile.jsx";
 import AccessLogs from "./pages/AccessLogs.jsx";
 import Devices from "./pages/Devices.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import MakePayment from "./pages/MakePayment.jsx";
+import PaymentHistory from "./pages/PaymentHistory.jsx";
+import Orders from "./pages/Orders.jsx";
+import OrderDetail from "./pages/OrderDetail.jsx";
+import CreateOrder from "./pages/CreateOrder.jsx";
 import Navbar from "./components/Navbar.jsx";
+import ShipmentList from "./pages/ShipmentList.jsx";
+import ShipmentDetail from "./pages/ShipmentDetail.jsx";
+import CreateShipment from "./pages/CreateShipment.jsx";
+import EditShipment from "./pages/EditShipment.jsx";
 
 function AppLayout({ children }) {
   return (
@@ -61,6 +70,33 @@ function App() {
       />
 
       <Route
+        path="/payments/create"
+        element={
+          <AppLayout>
+            <MakePayment />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/payments/history"
+        element={
+          <AppLayout>
+            <PaymentHistory />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/devices"
+        element={
+          <AppLayout>
+            <Devices />
+          </AppLayout>
+        }
+      />
+
+      <Route
         path="/orders"
         element={
           <AppLayout>
@@ -70,10 +106,55 @@ function App() {
       />
 
       <Route
+        path="/orders/new"
+        element={
+          <AppLayout>
+            <CreateOrder />
+          </AppLayout>
+        }
+      />
+
+      <Route
         path="/orders/:orderId"
         element={
           <AppLayout>
             <OrderDetail />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/shipments"
+        element={
+          <AppLayout>
+            <ShipmentList />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/shipments/create"
+        element={
+          <AppLayout>
+            <CreateShipment />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/shipments/:shipmentId"
+        element={
+          <AppLayout>
+            <ShipmentDetail />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/shipments/:shipmentId/edit"
+        element={
+          <AppLayout>
+            <EditShipment />
           </AppLayout>
         }
       />

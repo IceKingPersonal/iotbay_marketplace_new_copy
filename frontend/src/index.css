@@ -477,6 +477,47 @@ button:disabled {
   border-top-right-radius: 10px;
 }
 
+/* Feature 05 – Payments Page Styling */
+
+.payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  color: var(--heavy-purple);
+}
+
+.payments-table th {
+  background-color: var(--heavy-purple);
+  color: var(--freeze-purple);
+  text-align: left;
+  padding: 14px;
+  font-weight: 700;
+}
+
+.payments-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--freeze-purple);
+}
+
+.payments-table tr:hover {
+  background-color: var(--freeze-purple);
+}
+
+.payments-table th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.payments-table th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.payment-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
 /* Device Catalogue Page Styling */
 
 .devices-card {
@@ -537,12 +578,6 @@ button:disabled {
   gap: 12px;
 }
 
-.table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-}
-
-.access-log-table
 .device-table {
   width: 100%;
   border-collapse: collapse;
@@ -550,7 +585,6 @@ button:disabled {
   color: var(--heavy-purple);
 }
 
-.access-log-table th 
 .device-table th {
   background-color: var(--heavy-purple);
   color: var(--freeze-purple);
@@ -559,21 +593,44 @@ button:disabled {
   font-weight: 700;
 }
 
-.access-log-table td {
+.device-table td {
   padding: 14px;
   border-bottom: 1px solid var(--freeze-purple);
+  vertical-align: top;
 }
 
-.access-log-table tr:hover {
+.device-table tr:hover {
   background-color: var(--freeze-purple);
 }
 
-.access-log-table th:first-child {
+.device-table th:first-child {
   border-top-left-radius: 10px;
 }
 
-.access-log-table th:last-child {
+.device-table th:last-child {
   border-top-right-radius: 10px;
+}
+
+.select-column {
+  width: 52px;
+  text-align: center;
+}
+
+.select-column input {
+  width: auto;
+  margin: 0;
+}
+
+.row-actions {
+  flex-wrap: wrap;
+}
+
+.device-description {
+  display: block;
+  margin-top: 6px;
+  color: #666666;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 /* Orders feature (Feature 03) */
@@ -639,6 +696,97 @@ a.btn-secondary:hover {
   margin: 12px 0;
 }
 
+.order-summary {
+  margin-top: 1rem;
+  font-size: 1.05rem;
+}
+
+.order-lines-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.order-lines-header h2 {
+  margin: 0;
+}
+
+.btn-add-device {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background-color: #494d5f;
+  color: white;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-add-device:hover:not(:disabled) {
+  background-color: #363945;
+}
+
+.btn-add-device:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 38, 48, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.modal-card {
+  width: min(100%, 520px);
+  max-height: 85vh;
+  overflow-y: auto;
+  margin: 0;
+}
+
+.modal-product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.modal-product-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  border: 2px solid #e4e7ef;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.modal-product-option:hover {
+  border-color: #494d5f;
+}
+
+.modal-product-option--selected {
+  border-color: #494d5f;
+  background: #f4f5f8;
+}
+
 .product-list {
   list-style: none;
   padding: 0;
@@ -696,46 +844,6 @@ a.btn-secondary:hover {
 .order-status--cancelled {
   background-color: rgba(176, 0, 32, 0.12);
   color: #b00020;
-}
-
-.device-table td {
-  padding: 14px;
-  border-bottom: 1px solid var(--freeze-purple);
-  vertical-align: top;
-}
-
-.device-table tr:hover {
-  background-color: var(--freeze-purple);
-}
-
-.device-table th:first-child {
-  border-top-left-radius: 10px;
-}
-
-.device-table th:last-child {
-  border-top-right-radius: 10px;
-}
-
-.select-column {
-  width: 52px;
-  text-align: center;
-}
-
-.select-column input {
-  width: auto;
-  margin: 0;
-}
-
-.row-actions {
-  flex-wrap: wrap;
-}
-
-.device-description {
-  display: block;
-  margin-top: 6px;
-  color: #666666;
-  font-size: 14px;
-  line-height: 1.4;
 }
 
 @media (max-width: 820px) {

@@ -1,6 +1,6 @@
 // Displays the logged in user's dashboard. Edit this by adding a link from your feature to each page
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 
 function Dashboard() {
   const { user, isLoggedIn, loading } = useAuth();
@@ -59,17 +59,17 @@ function Dashboard() {
           <p>Add, view, update, or delete saved payment methods.</p>
         </div>
 
-        <div className="feature-card">
+        <Link className="feature-card" to="/payments/history">
           <h3>Feature 05</h3>
           <h2>Payments</h2>
           <p>Make payments and view payment history.</p>
-        </div>
+        </Link>
 
-        <div className="feature-card">
+        <Link className="feature-card" to="/shipments">
           <h3>Feature 06</h3>
           <h2>Shipments</h2>
           <p>View and manage shipment information.</p>
-        </div>
+        </Link>
 
         <div className="feature-card">
           <h3>Feature 07</h3>
